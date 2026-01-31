@@ -19,6 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.shopshere.UserInterface.Components.CategorySection
+import com.example.shopshere.UserInterface.Components.DealOfTheDay
+import com.example.shopshere.UserInterface.Components.HomeTopBar
+import com.example.shopshere.UserInterface.Components.OfferBanner
+import com.example.shopshere.UserInterface.Components.ProductSection
+import com.example.shopshere.UserInterface.Components.SearchhBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +35,7 @@ fun HomeScreen(
         contentPadding= PaddingValues(bottom=80.dp)
     ){
         item{HomeTopBar()}
-        item{SearchBar()}
+        item{SearchhBar()}
         item{CategorySection()}
         item{OfferBanner()}
         item{DealOfTheDay()}
