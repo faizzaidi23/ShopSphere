@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shopshere.UserInterface.Components.BottomBar
 import com.example.shopshere.UserInterface.Screens.CartScreen
 import com.example.shopshere.UserInterface.Screens.HomeScreen
+import com.example.shopshere.UserInterface.Screens.ProductDetailScreen
 import com.example.shopshere.UserInterface.Screens.ProfileScreen
 import com.example.shopshere.UserInterface.Screens.WishlistScreen
 
@@ -41,6 +42,12 @@ fun AppNavGraph(){
             }
             composable("profile"){
                 ProfileScreen()
+            }
+
+            composable("details"){
+                ProductDetailScreen(
+                    onBack = {navController.popBackStack()}
+                )
             }
         }
     }
