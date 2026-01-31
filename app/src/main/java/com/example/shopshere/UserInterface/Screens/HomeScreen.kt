@@ -34,12 +34,18 @@ fun HomeScreen(
         modifier=Modifier.fillMaxSize(),
         contentPadding= PaddingValues(bottom=80.dp)
     ){
+        item{Spacer(Modifier.height(8.dp))}
         item{HomeTopBar()}
+        item{Spacer(Modifier.height(8.dp))}
         item{SearchhBar()}
+        item{Spacer(Modifier.height(12.dp))}
         item{CategorySection()}
+
         item{OfferBanner()}
+        item{Spacer(Modifier.height(12.dp))}
         item{DealOfTheDay()}
+        item{Spacer(Modifier.height(12.dp))}
         item{ProductSection(title="Trending Products")}
-        item{Spacer(modifier=Modifier.height(16.dp))}
+
     }
 }
