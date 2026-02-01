@@ -43,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shopshere.UserInterface.theme.Primary
 import com.example.shopshere.data.local.CartDatabase
 import com.example.shopshere.data.repository.CartRepository
+import com.example.shopshere.data.repository.RepositoryProvider
 import com.example.shopshere.domain.model.CartItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,9 +52,10 @@ fun CartScreen(){
 
     val context=LocalContext.current
 
+    //val dao= CartDatabase.getDatabase(context).cartDao()
+    //val repository= CartRepository(dao)
 
-    val dao= CartDatabase.getDatabase(context).cartDao()
-    val repository= CartRepository(dao)
+    val repository= RepositoryProvider.provideCartRepository(context)
 
     //to manage the quantities now dynamically
     val viewModel: CartViewModel=viewModel(factory = CartViewModelFactory(repository))

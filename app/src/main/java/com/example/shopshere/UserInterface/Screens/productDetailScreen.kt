@@ -32,18 +32,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.shopshere.UserInterface.theme.Primary
+import com.example.shopshere.data.repository.RepositoryProvider
+import com.example.shopshere.domain.model.CartItem
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun ProductDetailScreen(
     onBack:()-> Unit={}
 ){
+
+    //newly added
+    val context=LocalContext.current
+
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,7 +74,7 @@ fun ProductDetailScreen(
 
         },
         bottomBar = {
-            BottomActionBar()
+            BottomActionBar(context = context)
         }
     ){internalPadding->
         LazyColumn(
@@ -172,7 +184,9 @@ fun DescriptionSection() {
 
 
 @Composable
-fun BottomActionBar() {
+fun BottomActionBar(context:android.content.Context) {
+    val repository= RepositoryProvider.provideCartRepository(context = context)
+    val scope= rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -182,7 +196,18 @@ fun BottomActionBar() {
     ) {
 
         OutlinedButton(
-            onClick = {},
+            onClick = {
+                scope.launch{
+                    repository.addItem(
+                        CartItem(
+                            id = "1",
+                            title="Women Printed Kurta",
+                            price=1500,
+                            quantity = 1
+                        )
+                    )
+                }
+            },
             modifier = Modifier.weight(1f)
         ) {
             Text("Add to Cart")

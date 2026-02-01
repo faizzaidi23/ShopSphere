@@ -5,7 +5,6 @@ import com.example.shopshere.data.local.CartDatabase
 
 
 /*
-
 object RepositoryProvider
 A single place that creates and shares one CartRepository instance across the app
 */
