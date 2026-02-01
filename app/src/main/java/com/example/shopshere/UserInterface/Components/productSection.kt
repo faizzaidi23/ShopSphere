@@ -1,5 +1,6 @@
 package com.example.shopshere.UserInterface.Components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,10 @@ import androidx.compose.ui.unit.dp
 import com.example.shopshere.UserInterface.theme.Surface
 
 @Composable
-fun ProductSection(title: String) {
+fun ProductSection(
+    title: String,
+    onProductClick:()-> Unit
+) {
 
     Column {
         Row(
@@ -54,17 +58,22 @@ fun ProductSection(title: String) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(6) {
-                ProductCard()
+                ProductCard(
+                    onClick = onProductClick
+                )
             }
         }
     }
 }
 
 @Composable
-fun ProductCard() {
+fun ProductCard(
+    onClick:()-> Unit
+) {
     Card(
         modifier = Modifier
-            .width(160.dp),
+            .width(160.dp)
+            .clickable { onClick() },
         shape=MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

@@ -29,6 +29,7 @@ import com.example.shopshere.UserInterface.Components.SearchhBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    onProductClick:()-> Unit
 ){
     LazyColumn(
         modifier=Modifier.fillMaxSize(),
@@ -45,7 +46,7 @@ fun HomeScreen(
         item{Spacer(Modifier.height(12.dp))}
         item{DealOfTheDay()}
         item{Spacer(Modifier.height(12.dp))}
-        item{ProductSection(title="Trending Products")}
+        item{ProductSection(title="Trending Products",onProductClick=onProductClick)}
 
     }
 }

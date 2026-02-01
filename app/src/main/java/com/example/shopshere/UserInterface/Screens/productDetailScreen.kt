@@ -68,6 +68,17 @@ fun ProductDetailScreen(
         LazyColumn(
             modifier=Modifier.padding(internalPadding).fillMaxSize()
         ){
+            item{ProductImageSection()}
+            item{Spacer(Modifier.height(8.dp))}
+
+            item{ProductInfoSection()}
+            item{Spacer(Modifier.height(12.dp))}
+
+            item{SizeSelector()}
+            item{Spacer(Modifier.height(8.dp))}
+
+            item{DescriptionSection()}
+            item{Spacer(Modifier.height(12.dp))}
 
         }
 
@@ -127,15 +138,10 @@ fun SizeSelector() {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-
         Text("Select Size")
-
         Spacer(Modifier.height(8.dp))
-
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-
             sizes.forEach { size ->
-
                 FilterChip(
                     selected = selected == size,
                     onClick = { selected = size },

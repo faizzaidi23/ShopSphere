@@ -29,7 +29,7 @@ fun AppNavGraph(){
             modifier = Modifier.padding(paddingValues)
         ){
             composable(BottomNavItem.Home.route){
-                HomeScreen()
+                HomeScreen(onProductClick = {navController.navigate("details")})
             }
             composable(BottomNavItem.Search.route){
                 ProfileScreen()
