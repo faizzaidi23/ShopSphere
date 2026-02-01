@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("kapt")
 }
 
 android {
@@ -62,4 +63,12 @@ dependencies {
 
     //for icons
     implementation("androidx.compose.material:material-icons-extended")
+
+    //for room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")// it generates the room code automatically
+
+    //for ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 }
