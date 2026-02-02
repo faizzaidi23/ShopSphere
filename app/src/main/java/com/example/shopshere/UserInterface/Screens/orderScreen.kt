@@ -120,7 +120,6 @@ fun EmptyOrders(){
                     imageVector = Icons.Default.LocalShipping,
                     contentDescription = null
                 )
-
                 Spacer(Modifier.width(6.dp))
 
                 Text(

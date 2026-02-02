@@ -13,6 +13,7 @@ import com.example.shopshere.UserInterface.Screens.HomeScreen
 import com.example.shopshere.UserInterface.Screens.OrderScreen
 import com.example.shopshere.UserInterface.Screens.ProductDetailScreen
 import com.example.shopshere.UserInterface.Screens.ProfileScreen
+import com.example.shopshere.UserInterface.Screens.SearchScreen
 import com.example.shopshere.UserInterface.Screens.WishlistScreen
 
 @Composable
@@ -33,7 +34,7 @@ fun AppNavGraph(){
                 HomeScreen(onProductClick = {navController.navigate("details")})
             }
             composable(BottomNavItem.Search.route){
-                ProfileScreen()
+                SearchScreen()
             }
             composable(BottomNavItem.Cart.route){
                 CartScreen()
@@ -51,7 +52,7 @@ fun AppNavGraph(){
                 )
             }
 
-            composable("orders"){
+            composable("order"){
                 OrderScreen()
             }
         }
