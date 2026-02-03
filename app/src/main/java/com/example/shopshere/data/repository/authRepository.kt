@@ -219,7 +219,37 @@ class AuthRepository{
         }
     }
 
+    //checking if the user needs re authentication after some days of inactivity or not
+
+
+    suspend fun checkSessionValidity(maxInactiveDays:Int=30):Boolean{
+        val user=currentUser?:return false
+
+        //getting last login time from the firestore
+        val userDoc=fireStore.collection("users")
+            .document(user.uid)
+            .get()
+            .await()
+
+        val lastLogin=userDoc.getLong("lastLoginTime")?:0L
+        val daysSinceLogin=(System.currentTimeMillis()-lastLogin)/(1000*60*60*24)
+
+        return if(daysSinceLogin>maxInactiveDays){
+            logout()
+            false
+        }else{
+            fireStore.collection("users")
+                .document(user.uid)
+                .update("lastLoginTime",System.currentTimeMillis())
+                .await()
+
+            true //the session is valid
+        }
+    }
+
     fun logout(){
         auth.signOut()
     }
 }
+
+
