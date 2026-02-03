@@ -74,9 +74,11 @@ dependencies {
     //for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
-    //For firebase bom
-    implementation(platform("com.google.firebse:firebase-bom:32.7.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
-    //firebase authentication
-    implementation("com.google.firebase:firebase-auth")
+    // Firebase Authentication
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx")
 }
