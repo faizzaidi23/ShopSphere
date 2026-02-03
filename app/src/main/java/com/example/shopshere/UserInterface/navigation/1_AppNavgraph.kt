@@ -42,8 +42,13 @@ fun AppNavGraph(){
             composable(BottomNavItem.Wishlist.route){
                 WishlistScreen()
             }
-            composable("profile"){
-                ProfileScreen()
+            composable(
+                BottomNavItem.Profile.route
+            ){
+                ProfileScreen(
+                    onOrderClick = {navController.navigate("order")},
+                    onLogoutClick = {}
+                )
             }
 
             composable("details"){

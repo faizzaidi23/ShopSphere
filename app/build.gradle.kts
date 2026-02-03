@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("kapt")
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -71,4 +73,10 @@ dependencies {
 
     //for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+
+    //For firebase bom
+    implementation(platform("com.google.firebse:firebase-bom:32.7.0"))
+
+    //firebase authentication
+    implementation("com.google.firebase:firebase-auth")
 }
