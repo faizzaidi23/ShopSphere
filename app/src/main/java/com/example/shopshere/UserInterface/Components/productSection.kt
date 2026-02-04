@@ -28,12 +28,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.shopshere.UserInterface.theme.Surface
+import com.example.shopshere.domain.model.Product
 
 @Composable
 fun ProductSection(
     title: String,
-    onProductClick:()-> Unit
+    products:List<Product>,//This is added when I was done with the Product viewModel
+    onProductClick:(String)-> Unit
 ) {
 
     Column {
@@ -57,9 +60,19 @@ fun ProductSection(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            /*
+            This was hardcoded before when there was no product  backend on the firebase
             items(6) {
                 ProductCard(
                     onClick = onProductClick
+                )
+            }
+            */
+            items(products.size){
+                index->
+                ProductCard(
+                    product=products[index],
+                    onClick={onProductClick(products[index].id)}
                 )
             }
         }
@@ -68,6 +81,7 @@ fun ProductSection(
 
 @Composable
 fun ProductCard(
+    product: Product,//This was added later when the viewModel part was done and the firebase firestore of the products
     onClick:()-> Unit
 ) {
     Card(
@@ -81,6 +95,9 @@ fun ProductCard(
             modifier = Modifier.padding(8.dp)
         ) {
             Box{
+                /*
+
+                This code was before when there was no viewModel and no images
                 Surface(
                     modifier=Modifier.height(120.dp).fillMaxWidth(),
                     color= MaterialTheme.colorScheme.surfaceVariant,
@@ -88,6 +105,16 @@ fun ProductCard(
                 ){
 
                 }
+
+                */
+
+                AsyncImage(
+                    model = product.imageUrls.firstOrNull(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(120.dp)
+                        .fillMaxWidth()
+                )
 
                 AssistChip(
                     onClick = {},
@@ -117,11 +144,16 @@ fun ProductCard(
             Spacer(modifier=Modifier.height(4.dp))
 
             Text(
-                "⭐ 4.5 (56890)",
-                style = MaterialTheme.typography.bodySmall
+                text=product.title,
+                maxLines=2,
+                style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(4.dp))
+
+            /*
+
+            Old code before the productViewModel part
 
             Row {
                 Text(
@@ -136,6 +168,12 @@ fun ProductCard(
                     )
                 )
             }
+            */
+
+            Text(
+                "${product.price}",
+                style= MaterialTheme.typography.titleSmall
+            )
         }
     }
 }

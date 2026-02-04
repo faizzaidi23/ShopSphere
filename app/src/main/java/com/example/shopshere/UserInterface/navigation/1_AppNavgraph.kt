@@ -84,7 +84,7 @@ fun AppNavGraph(){
             }
 
 
-            composable("register screen"){
+            composable("register"){
                 RegisterScreen(
                     onBackToLogin = {
                         navController.popBackStack()

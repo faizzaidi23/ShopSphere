@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
@@ -19,18 +20,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shopshere.UserInterface.Components.CategorySection
 import com.example.shopshere.UserInterface.Components.DealOfTheDay
 import com.example.shopshere.UserInterface.Components.HomeTopBar
 import com.example.shopshere.UserInterface.Components.OfferBanner
 import com.example.shopshere.UserInterface.Components.ProductSection
 import com.example.shopshere.UserInterface.Components.SearchhBar
+import com.example.shopshere.UserInterface.ViewModel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onProductClick:()-> Unit
 ){
+    //new added
+    val viewModel: HomeViewModel=viewModel()
+    val products=viewModel.products
+
     LazyColumn(
         modifier=Modifier.fillMaxSize(),
         contentPadding= PaddingValues(bottom=80.dp)
@@ -46,7 +53,19 @@ fun HomeScreen(
         item{Spacer(Modifier.height(12.dp))}
         item{DealOfTheDay()}
         item{Spacer(Modifier.height(12.dp))}
+        /*
+        This was the hardcoded part before adding the viewModel
+
         item{ProductSection(title="Trending Products",onProductClick=onProductClick)}
+        */
+
+        item{
+            ProductSection(
+                title="Trending Products",
+                products=products,
+                onProductClick=onProductClick
+            )
+        }
 
     }
 }
