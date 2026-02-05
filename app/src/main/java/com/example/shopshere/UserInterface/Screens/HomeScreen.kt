@@ -32,7 +32,7 @@ import com.example.shopshere.UserInterface.ViewModel.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onProductClick:()-> Unit
+    onProductClick:(String)-> Unit
 ){
     //new added
     val viewModel: HomeViewModel=viewModel()

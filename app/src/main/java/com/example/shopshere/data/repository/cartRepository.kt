@@ -7,10 +7,7 @@ import kotlinx.coroutines.flow.Flow
 class CartRepository(
     private val dao: CartDao
 ){
-    val cartItems:Flow<List<CartItem>>=dao.getCartItems()
-        get() {
-            TODO()
-        }
+    val cartItems: Flow<List<CartItem>> = dao.getCartItems()
 
     suspend fun addItem(item: CartItem)=dao.insert(item)
     suspend fun updateItem(item: CartItem)=dao.update(item)

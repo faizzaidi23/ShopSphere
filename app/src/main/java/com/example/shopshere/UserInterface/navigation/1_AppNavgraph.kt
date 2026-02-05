@@ -40,7 +40,9 @@ fun AppNavGraph(){
             modifier = Modifier.padding(paddingValues)
         ){
             composable(BottomNavItem.Home.route){
-                HomeScreen(onProductClick = {navController.navigate("details")})
+                HomeScreen(onProductClick = { productId ->
+                    navController.navigate("details/$productId")
+                })
             }
             composable(BottomNavItem.Search.route){
                 SearchScreen()
@@ -60,7 +62,7 @@ fun AppNavGraph(){
                 )
             }
 
-            composable("details"){
+            composable("details/{productId}"){
                 ProductDetailScreen(
                     onBack = {navController.popBackStack()}
                 )
