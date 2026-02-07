@@ -5,160 +5,39 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-///*
-//Firebase Authentication - handles login/signup
-//Firestore Database - stores user data (NoSQL, schema-less)
-//Converts Firebase Tasks to suspend functions for coroutines
-//*/
-//import com.google.firebase.auth.FirebaseAuth
-//import com.google.firebase.firestore.FirebaseFirestore
-//import kotlinx.coroutines.tasks.await
-//
-///*
-//Repository Pattern: Acts as single source of truth for authentication operations
-//Separates business logic from UI (ViewModel calls this, not Firebase directly)
-//*/
-//class AuthRepository{
-//    /*
-//    Firebase Auth instance (singleton pattern - one instance for entire app)
-//    */
-//    private val auth=FirebaseAuth.getInstance()
-//
-//    /*
-//    Firestore instance (singleton) - NoSQL database
-//    Schema-less: No need to pre-define tables/collections, they auto-create when referenced
-//    */
-//    private val fireStore=FirebaseFirestore.getInstance()
-//
-//    /*
-//    Getter-only property that returns currently logged-in user
-//    Returns null if no user is logged in
-//    Recalculated every time you access it (not stored)
-//    */
-//    val currentUser get()=auth.currentUser
-//
-//
-//    /*
-//    LOGIN FUNCTION
-//    suspend keyword: This function runs in a coroutine (can pause/resume)
-//    await(): Converts Firebase Task<AuthResult> to suspend function
-//    Throws exception if login fails (wrong password, user not found, etc.)
-//    */
-//    suspend fun login(email:String,password:String){
-//        auth.signInWithEmailAndPassword(email,password).await()
-//    }
-//
-//
-//    /*
-//    REGISTER FUNCTION
-//    Creates new user in Firebase Auth AND stores additional data in Firestore
-//    Firebase Auth only stores email/password, so we use Firestore for name, role, etc.
-//    Role: "buyer" or "seller" - determines app permissions/features
-//    */
-//    suspend fun register(
-//        name:String,
-//        email:String,
-//        password: String,
-//        role: String
-//    ){
-//        /*
-//        STEP 1: Create user account in Firebase Authentication
-//        */
-//        val result=auth.createUserWithEmailAndPassword(email,password).await()
-//
-//        /*
-//        STEP 2: Extract auto-generated UID (Unique User ID)
-//        Firebase automatically generates a unique UID for each user
-//        !! operator: Asserts result.user is not null (risky - app crashes if null)
-//        Better approach: result.user?.uid ?: throw Exception("User creation failed")
-//        */
-//        val uid=result.user!!.uid
-//
-//        /*
-//        STEP 3: Save user info to Firestore database
-//        Collection "users" will auto-create if it doesn't exist (NoSQL feature)
-//        Document ID = UID (makes it easy to find user data: users/{uid})
-//        */
-//        fireStore.collection("users")
-//            .document(uid)
-//            .set(
-//                mapOf(
-//                    "name" to name,
-//                    "email" to email,
-//                    "role" to role
-//                )
-//            ).await()
-//
-//        /*
-//        ALTERNATIVES TO ABOVE CODE:
-//
-//        Option 1: Using data class (RECOMMENDED - type-safe, cleaner)
-//        data class User(val name: String, val email: String, val role: String)
-//        fireStore.collection("users").document(uid).set(User(name, email, role)).await()
-//
-//        Option 2: Using hashMapOf instead of mapOf
-//        fireStore.collection("users").document(uid).set(hashMapOf("name" to name, "email" to email, "role" to role)).await()
-//
-//        Option 3: Using set with merge (merges with existing data instead of overwriting)
-//        fireStore.collection("users").document(uid).set(mapOf(...), SetOptions.merge()).await()
-//
-//        Option 4: Using update (only updates specified fields, fails if document doesn't exist)
-//        fireStore.collection("users").document(uid).update("name", name, "email", email, "role", role).await()
-//
-//        WHY set()?
-//        - Creates document if doesn't exist
-//        - Overwrites entire document if exists
-//        - Use update() if you only want to modify specific fields
-//        - Use merge() if you want to combine with existing data
-//        */
-//    }
-//
-//
-//    /*
-//    LOGOUT FUNCTION
-//    Not suspend because signOut() is synchronous (instant, no network call)
-//    Clears authentication session - user will need to login again
-//    */
-//    fun logout(){
-//        auth.signOut()
-//    }
-//}
-
-
-
 class AuthRepository{
-    private val auth=FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val fireStore = FirebaseFirestore.getInstance()
 
-    private val fireStore= FirebaseFirestore.getInstance()
+    val currentUser get() = auth.currentUser
 
-    val currentUser get()=auth.currentUser
-
-    //Email validation function
-    private fun  isValidEmail(email:String):Boolean{
+    // Email validation function
+    private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    //send otp to email
+    // Step 1: Send OTP to email during registration
     suspend fun sentOtpToEmail(
-        name:String,
-        email:String,
-        password:String,
+        name: String,
+        email: String,
+        password: String,
         role: String
-    ){
-        if(name.isBlank())throw Exception("Name cannot be empty")
-        if(!isValidEmail(email))throw Exception("Invalid email format")
-        if(password.length<6)throw Exception("Password must be at least 6 characters long")
-        if(role!="buyer" && role!="seller")throw Exception("Invalid role")
+    ) {
+        // Validation
+        if (name.isBlank()) throw Exception("Name cannot be empty")
+        if (!isValidEmail(email)) throw Exception("Invalid email format")
+        if (password.length < 6) throw Exception("Password must be at least 6 characters long")
+        if (role != "buyer" && role != "seller") throw Exception("Invalid role")
 
+        // Create user in Firebase Auth
+        val result = auth.createUserWithEmailAndPassword(email, password).await()
 
-        val result=auth.createUserWithEmailAndPassword(email,password).await()
-
-        //sending verification email with otp link
+        // Send verification email with OTP link
         result.user?.sendEmailVerification()?.await()
-            ?:throw Exception("Failed to send the verification email")
+            ?: throw Exception("Failed to send the verification email")
 
-        //store use data as unverified
-        val uid=result.user!!.uid
+        // Store user data as unverified in Firestore
+        val uid = result.user!!.uid
         fireStore.collection("users")
             .document(uid)
             .set(mapOf(
@@ -167,89 +46,101 @@ class AuthRepository{
                 "role" to role,
                 "emailVerified" to false,
                 "createdAt" to System.currentTimeMillis()
-
             )).await()
 
-        //sign out user(they must verify email before logging in)
-
+        // IMPORTANT: Sign out user (they must verify email before logging in)
+        auth.signOut()
     }
 
-    //step 2-->Verify the otp and complete registration
-    suspend fun verifyEmailAndLogin(email:String,password: String){
+    // Login (only for verified users)
+    suspend fun login(email: String, password: String) {
+        // Validation
+        if (!isValidEmail(email)) throw Exception("Invalid email format")
+        if (password.isBlank()) throw Exception("Password cannot be empty")
 
-        //login with credentials
-        auth.signInWithEmailAndPassword(email,password).await()
+        // Sign in with credentials
+        auth.signInWithEmailAndPassword(email, password).await()
 
-        //reload user to get the latest verification status
+        // Reload to get the latest verification status
         currentUser?.reload()?.await()
 
-        //check if email is verified or not
-        if(currentUser?.isEmailVerified==true){
-            //update firestore to mark as verified
+        // Check email verification
+        if (currentUser?.isEmailVerified == false) {
+            auth.signOut()
+            throw Exception("Email not verified. Please check your inbox and verify your email first.")
+        }
+
+        // Update last login time in Firestore
+        currentUser?.let { user ->
             fireStore.collection("users")
-                .document(currentUser!!.uid)
-                .update("emailVerified",true)
-                .await()
-        }else{
-            auth.signOut()
-            throw Exception("Please verify your email first. Check your inbox")
+                .document(user.uid)
+                .update(
+                    mapOf(
+                        "emailVerified" to true,
+                        "lastLoginTime" to System.currentTimeMillis()
+                    )
+                ).await()
         }
     }
 
-    //resending verification email
-    suspend fun resendVerificationEmail(){
-        currentUser?.sendEmailVerification()?.await()
-            ?:throw Exception("No user logged in")
-    }
+    // Resend verification email (for users who didn't receive it)
+    suspend fun resendVerificationEmail(email: String, password: String) {
+        // Sign in temporarily to send verification email
+        auth.signInWithEmailAndPassword(email, password).await()
 
-    //login (only for the verified users)
-    suspend fun login(email:String,password: String){
-        if(!isValidEmail(email))throw Exception("Invalid email format")
-        if(password.isBlank())throw Exception("Password cannot be empty")
-
-        auth.signInWithEmailAndPassword(email,password).await()
-
-        //reload to get the latest verification status
+        // Check if already verified
         currentUser?.reload()?.await()
-
-        //check email verification
-        if(currentUser?.isEmailVerified==false){
+        if (currentUser?.isEmailVerified == true) {
             auth.signOut()
-            throw Exception("Email not verified. Get that verified first")
+            throw Exception("Email is already verified. Please login.")
         }
+
+        // Send verification email
+        currentUser?.sendEmailVerification()?.await()
+            ?: throw Exception("Failed to send verification email")
+
+        // Sign out
+        auth.signOut()
     }
 
-    //checking if the user needs re authentication after some days of inactivity or not
+    // Check session validity (optional - for enhanced security)
+    suspend fun checkSessionValidity(maxInactiveDays: Int = 30): Boolean {
+        val user = currentUser ?: return false
 
-
-    suspend fun checkSessionValidity(maxInactiveDays:Int=30):Boolean{
-        val user=currentUser?:return false
-
-        //getting last login time from the firestore
-        val userDoc=fireStore.collection("users")
+        // Get last login time from Firestore
+        val userDoc = fireStore.collection("users")
             .document(user.uid)
             .get()
             .await()
 
-        val lastLogin=userDoc.getLong("lastLoginTime")?:0L
-        val daysSinceLogin=(System.currentTimeMillis()-lastLogin)/(1000*60*60*24)
+        val lastLogin = userDoc.getLong("lastLoginTime") ?: 0L
+        val daysSinceLogin = (System.currentTimeMillis() - lastLogin) / (1000 * 60 * 60 * 24)
 
-        return if(daysSinceLogin>maxInactiveDays){
+        return if (daysSinceLogin > maxInactiveDays) {
             logout()
             false
-        }else{
+        } else {
+            // Update last login time
             fireStore.collection("users")
                 .document(user.uid)
-                .update("lastLoginTime",System.currentTimeMillis())
+                .update("lastLoginTime", System.currentTimeMillis())
                 .await()
-
-            true //the session is valid
+            true // Session is valid
         }
     }
 
-    fun logout(){
+    // Get user role from Firestore
+    suspend fun getUserRole(): String? {
+        val user = currentUser ?: return null
+        val userDoc = fireStore.collection("users")
+            .document(user.uid)
+            .get()
+            .await()
+        return userDoc.getString("role")
+    }
+
+    // Logout
+    fun logout() {
         auth.signOut()
     }
 }
-
-

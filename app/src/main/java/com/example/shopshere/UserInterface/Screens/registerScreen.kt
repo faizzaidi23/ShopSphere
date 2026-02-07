@@ -18,13 +18,14 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.shopshere.data.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -42,6 +43,8 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var role by remember { mutableStateOf("buyer") }
     var message by remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false) }
+    var registrationSuccess by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -68,7 +71,10 @@ fun RegisterScreen(
                 Spacer(Modifier.height(20.dp))
 
                 if (message.isNotEmpty()) {
-                    Text(message, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        message,
+                        color = if (isError) MaterialTheme.colorScheme.error else Color.Green
+                    )
                     Spacer(Modifier.height(8.dp))
                 }
 
@@ -76,7 +82,8 @@ fun RegisterScreen(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !registrationSuccess
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -85,7 +92,8 @@ fun RegisterScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !registrationSuccess
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -94,37 +102,58 @@ fun RegisterScreen(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !registrationSuccess
                 )
 
                 Spacer(Modifier.height(14.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(role == "buyer", { role = "buyer" })
+                    RadioButton(
+                        selected = role == "buyer",
+                        onClick = { role = "buyer" },
+                        enabled = !registrationSuccess
+                    )
                     Text("Buyer")
 
                     Spacer(Modifier.width(16.dp))
 
-                    RadioButton(role == "seller", { role = "seller" })
+                    RadioButton(
+                        selected = role == "seller",
+                        onClick = { role = "seller" },
+                        enabled = !registrationSuccess
+                    )
                     Text("Seller")
                 }
 
                 Spacer(Modifier.height(18.dp))
 
-                Button(
-                    onClick = {
-                        scope.launch {
-                            try {
-                                repo.sentOtpToEmail(name, email, password, role)
-                                message = "Verification email sent. Check inbox."
-                            } catch (e: Exception) {
-                                message = e.message ?: ""
+                if (!registrationSuccess) {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    repo.sentOtpToEmail(name, email, password, role)
+                                    message = "✓ Verification email sent! Check your inbox and click the link to verify."
+                                    isError = false
+                                    registrationSuccess = true
+                                } catch (e: Exception) {
+                                    message = e.message ?: "Registration failed"
+                                    isError = true
+                                }
                             }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Register")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Register")
+                    }
+                } else {
+                    // Show message about next steps
+                    Text(
+                        "After verifying your email, click 'Back to Login' to sign in.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
 
                 Spacer(Modifier.height(8.dp))
